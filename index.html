@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore MVMC's 4D reconstruction and point tracking from synchronized RGB videos in an interactive 3D viewer.">
+  <meta name="theme-color" content="#f5f7fc">
+  <meta property="og:title" content="MVMC · Multi-View 4D Reconstruction and Tracking">
+  <meta property="og:description" content="Explore 3D reconstructions, point trajectories, and results from unposed multi-camera videos.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bestzbf.github.io/mvmc-project/">
+  <meta property="og:image" content="https://bestzbf.github.io/mvmc-project/assets/media/share-card.jpg">
+  <title>MVMC · Multi-View 4D Reconstruction and Tracking</title>
+  <link rel="canonical" href="https://bestzbf.github.io/mvmc-project/">
+  <link rel="icon" href="./assets/media/icon.png" type="image/png">
+  <link rel="preload" href="./assets/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="header-inner wrap">
+      <a href="./" class="wordmark"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>MVMC</a>
+      <nav aria-label="Sections">
+        <a href="#viewer">4D viewer</a>
+        <a href="#captures">Real scenes</a>
+        <a href="#comparisons">Comparisons</a>
+        <a href="#results">Results</a>
+        <a href="#method">Method</a>
+      </nav>
+      <a class="button outline repo-link" href="https://github.com/bestzbf/mvmc">GitHub</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero wrap" aria-labelledby="project-title">
+      <div class="hero-copy">
+        <h1 id="project-title">Multi-View 4D<br> Reconstruction<br> <span>and Tracking</span></h1>
+        <p class="subtitle">From unposed multi-camera videos</p>
+        <p class="hero-summary">MVMC reconstructs a moving scene in 3D and follows points across time and cameras from synchronized RGB.</p>
+        <div class="hero-actions">
+          <a href="#viewer" class="button primary">Explore in 3D</a>
+          <a href="#results" class="button outline">View results</a>
+        </div>
+      </div>
+      <div class="viewer" id="viewer" aria-labelledby="viewer-title">
+        <div class="viewer-head">
+          <h2 id="viewer-title">Interactive 4D viewer</h2>
+          <label class="sr-only" for="scene">3D scene</label>
+          <select id="scene">
+            <option value="whale-cat">Bronze whale &amp; concrete cat</option>
+            <option value="ray-vase">Bronze ray &amp; ceramic vase</option>
+          </select>
+        </div>
+        <div class="viewer-stage" id="viewer-stage">
+          <img class="viewer-poster" id="viewer-poster" src="./assets/media/whale-cat-preview.webp" alt="Bronze whale and concrete cat reconstructed from two camera views" fetchpriority="high" width="800" height="550">
+          <canvas id="scene-canvas" tabindex="0" aria-label="3D scene. Use arrow keys to orbit and plus or minus to zoom." hidden></canvas>
+          <p id="viewer-status" class="viewer-status" role="status">Loading the 3D scene…</p>
+          <div class="viewer-overlays" id="viewer-overlays" hidden>
+            <div class="viewer-source" role="group" aria-label="3D reconstruction source">
+              <button type="button" data-cloud="predicted" aria-pressed="true">MVMC</button>
+              <button type="button" data-cloud="reference" aria-pressed="false">Rendered ref.</button>
+            </div>
+            <div class="viewer-camera" role="group" aria-label="Camera controls">
+              <button type="button" id="zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
+              <button type="button" id="zoom-out" aria-label="Zoom out" title="Zoom out">−</button>
+              <button type="button" id="reset-camera">Reset view</button>
+            </div>
+          </div>
+        </div>
+        <div class="viewer-bottom" id="viewer-bottom" hidden>
+          <div class="playback">
+            <button id="play-scene" class="play" type="button" aria-label="Play 3D scene"><span aria-hidden="true"></span></button>
+            <label class="sr-only" for="scene-time">3D frame</label>
+            <input id="scene-time" type="range" min="1" max="24" value="5" step="1">
+            <output id="frame-output" for="scene-time" aria-live="off">05 / 24</output>
+          </div>
+          <div class="viewer-footer">
+            <span>Drag to orbit · Scroll to zoom</span>
+            <label class="track-switch"><input id="show-trails" type="checkbox" checked>Trajectories</label>
+          </div>
+        </div>
+        <noscript><p class="no-js">The 3D viewer uses JavaScript. The real-scene video and benchmark table are available below.</p></noscript>
+      </div>
+      <div class="hero-meta">
+        <p class="authors">Binfeng Zou<sup>1</sup>, Qi Xu<sup>2</sup>, Jiagang Chen<sup>3</sup>, Yihao Guo<sup>1</sup>, Qihang Xu<sup>4</sup>, Zhiwen Zheng<sup>1</sup>, Xingru Huang<sup>1</sup>, Jin Liu<sup>1</sup></p>
+        <p class="affiliations"><span><sup>1</sup> Hangzhou Dianzi University</span><span><sup>2</sup> Westlake University</span><span><sup>3</sup> Wuhan University</span><span><sup>4</sup> Tongji University</span></p>
+        <details class="viewer-notes">
+          <summary>How the 3D scenes are displayed</summary>
+          <p>These two synthetic scenes use two synchronized RGB views and 24 observed times. The viewer displays subsampled points in the rendered foreground and applies one fixed similarity alignment to the MVMC result. The rendered reference uses known cameras and independent rendered depth. Colored trails show six corresponding points.</p>
+          <figure class="input-preview"><img id="input-view" src="./assets/scenes/whale-cat-input.jpg" alt="One synthetic RGB input for the selected scene" width="504" height="504" loading="lazy"><figcaption>One RGB input view, frame 12.</figcaption></figure>
+        </details>
+      </div>
+    </section>
+
+    <section id="captures" class="section captures-section" aria-labelledby="captures-title">
+      <div class="wrap">
+        <div class="section-intro">
+          <h2 id="captures-title">Real-world sequences</h2>
+          <p>Watch reconstruction and tracks across hand–object interaction, human motion, and driving scenes. Each clip includes its reference depth and its display protocol.</p>
+        </div>
+        <div class="film">
+          <div class="film-header">
+            <span class="dataset-label" id="film-dataset">Hoi!</span>
+            <h3 id="film-title">Opening a storage bench</h3>
+          </div>
+          <video id="real-video" controls playsinline loop preload="none" poster="./assets/media/hoi-poster.webp" src="./assets/media/hoi.mp4" aria-label="Opening a storage bench on the Hoi! dataset">
+            <a href="./assets/media/hoi.mp4">Download the Hoi! clip</a>
+          </video>
+          <p class="film-note" id="film-note">Two synchronized iPhone views. The reference uses device depth. Colored tracks are MVMC predictions.</p>
+        </div>
+        <div class="scene-grid" id="video-scenes" role="group" aria-label="Real-world video"></div>
+      </div>
+    </section>
+
+    <section id="comparisons" class="section wrap" aria-labelledby="comparisons-title">
+      <div class="section-intro">
+        <h2 id="comparisons-title">Compare reconstruction and motion</h2>
+        <p>Choose a scene and two methods. Switch between the point cloud at the displayed frame and trajectories over the full clip.</p>
+      </div>
+      <div class="scene-grid comparison-scenes" id="comparison-scenes" role="group" aria-label="Comparison scene"></div>
+      <div class="comparison">
+        <div class="compare-toolbar">
+          <div class="segment" role="group" aria-label="Panel content" id="compare-kind">
+            <button type="button" data-kind="geometry" aria-pressed="true">Reconstruction</button>
+            <button type="button" data-kind="tracks" aria-pressed="false">Trajectories</button>
+          </div>
+          <div class="segment" role="group" aria-label="Comparison layout" id="compare-layout">
+            <button type="button" data-layout="pair" aria-pressed="true">Side by side</button>
+            <button type="button" data-layout="wipe" aria-pressed="false">Reveal</button>
+          </div>
+        </div>
+        <div class="compare-methods">
+          <label>Left method <select id="compare-left" aria-label="Left method"></select></label>
+          <label>Right method <select id="compare-right" aria-label="Right method"></select></label>
+        </div>
+        <div id="compare-stage" class="compare-stage" data-layout="pair">
+          <figure><img id="compare-left-img" src="./assets/media/whale-cat-mvmc-geometry.webp" alt="MVMC reconstruction of bronze whale and concrete cat" width="312" height="346" loading="lazy"></figure>
+          <figure><img id="compare-right-img" src="./assets/media/whale-cat-fourrc-geometry.webp" alt="4RC reconstruction of bronze whale and concrete cat" width="312" height="346" loading="lazy"></figure>
+          <div class="reveal-marker" aria-hidden="true"></div>
+          <input id="reveal" type="range" min="0" max="100" value="50" aria-label="Reveal more of the left result" hidden>
+        </div>
+        <div class="compare-footer">
+          <p id="compare-note">Geometry panels share the same display projection. The original figure lists the frame number and alignment details.</p>
+          <a id="full-comparison" href="./assets/media/whale-cat-comparison.webp">Open full figure</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="section results-section" aria-labelledby="results-title">
+      <div class="wrap">
+        <div class="section-intro">
+          <h2 id="results-title">Multi-camera tracking results</h2>
+          <p>Four synchronized RGB views per clip. We evaluate 3D trajectories in the first camera’s frame with one query-anchor scale per clip.</p>
+        </div>
+        <div class="results-shell">
+          <div class="results-header">
+            <div class="segment" role="group" aria-label="Benchmark dataset" id="benchmarks">
+              <button type="button" data-benchmark="kubric" aria-pressed="true">MV-Kubric</button>
+              <button type="button" data-benchmark="panoptic" aria-pressed="false">Panoptic</button>
+            </div>
+            <span class="result-context" id="result-context">30 clips · 24 frames</span>
+          </div>
+          <div class="table-scroll" role="region" aria-label="Benchmark results table" tabindex="0">
+            <table id="result-table">
+              <caption class="sr-only" id="result-caption">Multi-camera 3D point tracking on MV-Kubric</caption>
+              <thead><tr>
+                <th scope="col">Method</th>
+                <th scope="col"><abbr title="Average 3D hit rate across four distance thresholds">APD</abbr> ↑</th>
+                <th scope="col">10 cm ↑</th>
+                <th scope="col">20 cm ↑</th>
+                <th scope="col"><abbr title="End-point error in meters">EPE</abbr> ↓</th>
+                <th scope="col"><abbr title="Average Jaccard">AJ</abbr> ↑</th>
+                <th scope="col"><abbr title="Occlusion accuracy">OA</abbr> ↑</th>
+              </tr></thead>
+              <tbody>
+                <tr class="own"><th scope="row">MVMC</th><td>89.24</td><td>67.21</td><td>87.66</td><td>0.1118</td><td>62.79</td><td>73.22</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="results-footer">
+            <p>APD averages the hit rates at 10, 30, 50, and 100 cm. APD, distance hit rates, AJ, and OA are percentages. EPE is in meters. Visibility is evaluated across all input views.</p>
+            <p>A dash indicates an unavailable score.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="method" class="section wrap" aria-labelledby="method-title">
+      <div class="section-intro">
+        <h2 id="method-title">How MVMC works</h2>
+        <p>Camera identities and shared frame indices organize the input. The model estimates camera parameters and depth together with a trajectory for each queried source pixel.</p>
+      </div>
+      <figure class="method-graphic">
+        <a href="./assets/media/framework.webp"><img src="./assets/media/framework.webp" width="2300" height="880" alt="MVMC architecture showing synchronized frames, a shared encoder, geometry and motion branches, trajectory refinement, and per-view visibility" loading="lazy"></a>
+      </figure>
+      <div class="method-notes">
+        <div><h3>Encode across views</h3><p>Camera Relation Attention uses camera identity to connect observations across cameras and time.</p></div>
+        <div><h3>Anchor motion in 3D</h3><p>Predicted geometry anchors each point at its source frame. Time-conditioned decoding predicts its displacement.</p></div>
+        <div><h3>Refine and test visibility</h3><p>Local image evidence from the target views refines the trajectory. The Visibility Head estimates its visibility per camera.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div class="footer-top">
+        <a href="./" class="wordmark"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>MVMC</a>
+        <a href="https://github.com/bestzbf/mvmc-project">Website source</a>
+      </div>
+      <details class="credits" id="credits">
+        <summary>Sources and credits</summary>
+        <p>Edited Hoi! clips use <a href="https://hoi-dataset.ethz.ch/">the Hoi! dataset</a> under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Edited driving footage uses <a href="https://dsec.ifi.uzh.ch/">the DSEC dataset</a> and is shared under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. HuMMan-Recon clips use <a href="https://huggingface.co/datasets/caizhongang/HuMMan">HuMMan by Cai et al.</a> under the <a href="./assets/licenses/humman.txt">S-Lab License 1.0</a> for non-commercial research. The clips were trimmed and annotated to show reconstruction and point tracking.</p>
+        <p>The synthetic scenes use <a href="https://polyhaven.com/license">Poly Haven (CC0)</a> assets, including the <a href="https://polyhaven.com/a/bronze_whale_statue">bronze whale</a>, <a href="https://polyhaven.com/a/concrete_cat_statue">concrete cat</a>, <a href="https://polyhaven.com/a/bronze_ray_statue">bronze ray</a>, <a href="https://polyhaven.com/a/ceramic_vase_04">ceramic vase</a>, <a href="https://polyhaven.com/a/spinning_wheel_01">spinning wheel</a>, and <a href="https://polyhaven.com/a/gothic_statue">Gothic statue</a>. Benchmarks use the <a href="https://ethz-vlg.github.io/mvtracker/">MVTracker</a> protocol on <a href="http://domedb.perception.cs.cmu.edu/">CMU Panoptic Studio</a> and MV-Kubric.</p>
+      </details>
+    </div>
+  </footer>
+</body>
+</html>
