@@ -22,6 +22,8 @@ const FRAGMENT_SOURCE = 'precision mediump float;' +
 const PALETTE = [
   [.98, .60, .35], [.70, .58, 1.0], [.31, .87, 1.0],
   [.37, .95, .70], [1.0, .52, .62], [.97, .85, .44],
+  [.45, .64, 1.0], [1.0, .46, .78], [.63, .98, .54],
+  [1.0, .70, .45], [.63, .84, .99], [.95, .9, .67],
 ];
 
 const clamp = (n, low, high) => Math.min(high, Math.max(low, n));
@@ -125,7 +127,7 @@ export class PointCloudViewer {
     if (!this.meta) return;
     this.azimuth = this.meta.orbit.azimuth;
     this.elevation = this.meta.orbit.elevation;
-    this.zoomFactor = 1;
+    this.zoomFactor = this.meta.orbit.zoom ?? 1;
     this.draw();
   }
 
@@ -194,6 +196,10 @@ export class PointCloudViewer {
 
   prepareFloor() {
     const { gl, meta } = this;
+    if (meta.floor === false) {
+      this.gridCount = 0;
+      return;
+    }
     const [x, y, z] = meta.center;
     const r = meta.viewRadius;
     const floor = y - .67 * r;
@@ -259,13 +265,16 @@ export class PointCloudViewer {
     gl.disable(gl.DEPTH_TEST);
     gl.uniform1i(this.splat, 0);
     gl.uniform1i(this.shade, 0);
-    this.bind(this.gridBuffer);
-    gl.drawArrays(gl.LINES, 0, this.gridCount);
+    if (this.gridCount) {
+      this.bind(this.gridBuffer);
+      gl.drawArrays(gl.LINES, 0, this.gridCount);
+    }
 
     gl.enable(gl.DEPTH_TEST);
     gl.uniform1i(this.splat, 1);
     gl.uniform1i(this.shade, 1);
-    gl.uniform1f(this.size, clamp((cssHeight / 103) / this.zoomFactor, 1.9, 7.5) * dpr);
+    const pointSize = (cssHeight / 103) / this.zoomFactor * (meta.pointSize ?? 1);
+    gl.uniform1f(this.size, clamp(pointSize, 1.3, 7.5) * dpr);
     this.bind(this.cloudBuffer, true);
     gl.drawArrays(gl.POINTS, 0, this.frames[this.frame].count);
 
@@ -276,11 +285,12 @@ export class PointCloudViewer {
     const gl = this.gl;
     const vertices = [];
     const ends = [];
+    const since = Math.max(1, this.frame - (this.meta.trailLength ?? this.frame) + 1);
     for (let i = 0; i < this.tracks.length; i += 1) {
       const track = this.tracks[i];
       const color = PALETTE[i % PALETTE.length];
       if (track[this.frame]) addVertex(ends, track[this.frame], color);
-      for (let j = 1; j <= this.frame; j += 1) {
+      for (let j = since; j <= this.frame; j += 1) {
         if (!track[j - 1] || !track[j]) continue;
         addVertex(vertices, track[j - 1], color);
         addVertex(vertices, track[j], color);

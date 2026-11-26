@@ -14,8 +14,8 @@
   <link rel="canonical" href="https://bestzbf.github.io/mvmc-project/">
   <link rel="icon" href="./assets/media/icon.png" type="image/png">
   <link rel="preload" href="./assets/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="./styles.css">
-  <script type="module" src="./app.js"></script>
+  <link rel="stylesheet" href="./styles.css?v=4d-scenes">
+  <script type="module" src="./app.js?v=4d-scenes"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -57,25 +57,25 @@
       <div class="wrap">
         <div class="section-intro">
           <h2 id="viewer-title">Explore in 3D</h2>
-          <p>Rotate a scene while it moves. Scrub the timeline, follow a point, and switch between MVMC and the rendered reference from the same viewpoint.</p>
+          <p>Orbit the reconstructions, scrub through time, and follow the predicted 3D tracks. Selected scenes also show rendered or measured depth.</p>
         </div>
         <div class="studio-layout">
           <div class="viewer" aria-label="Interactive 4D viewer">
         <div class="viewer-head">
-          <h3 id="viewer-scene-name">Bronze whale &amp; concrete cat</h3>
+          <h3 id="viewer-scene-name">Running fox &amp; jumping robot</h3>
           <div class="viewer-meta">
             <span id="viewer-scene-context">24 frames</span>
             <button id="expand-viewer" type="button" hidden>Full screen</button>
           </div>
         </div>
         <div class="viewer-stage" id="viewer-stage">
-          <img class="viewer-poster" id="viewer-poster" src="./assets/media/whale-cat-preview.webp" alt="Bronze whale and concrete cat reconstructed from two camera views" fetchpriority="high" width="800" height="550">
+          <img class="viewer-poster" id="viewer-poster" src="./assets/scenes/fox-robot-preview.webp" alt="A point cloud of a running fox and jumping robot" width="800" height="550">
           <canvas id="scene-canvas" tabindex="0" aria-label="3D scene. Use arrow keys to orbit and plus or minus to zoom." hidden></canvas>
           <p id="viewer-status" class="viewer-status" role="status">Loading the 3D scene…</p>
           <div class="viewer-overlays" id="viewer-overlays" hidden>
             <div class="viewer-source" role="group" aria-label="3D reconstruction source">
               <button type="button" data-cloud="predicted" aria-pressed="true">MVMC</button>
-              <button type="button" data-cloud="reference" aria-pressed="false">Rendered ref.</button>
+              <button type="button" data-cloud="reference" aria-pressed="false">Rendered reference</button>
             </div>
             <div class="viewer-camera" role="group" aria-label="Camera controls">
               <button type="button" id="zoom-in" aria-label="Zoom in" title="Zoom in">+</button>
@@ -88,8 +88,8 @@
           <div class="playback">
             <button id="play-scene" class="play" type="button" aria-label="Play 3D scene"><span aria-hidden="true"></span></button>
             <label class="sr-only" for="scene-time">3D frame</label>
-            <input id="scene-time" type="range" min="1" max="24" value="5" step="1">
-            <output id="frame-output" for="scene-time" aria-live="off">05 / 24</output>
+            <input id="scene-time" type="range" min="1" max="24" value="15" step="1">
+            <output id="frame-output" for="scene-time" aria-live="off">15 / 24</output>
           </div>
           <div class="viewer-footer">
             <span>Drag to orbit · Scroll to zoom</span>
@@ -101,9 +101,9 @@
           <div class="studio-scenarios" id="studio-scenes" role="group" aria-label="3D scenes"></div>
         </div>
         <details class="viewer-notes">
-          <summary>How the 3D scenes are displayed</summary>
-          <p>The synthetic scenes use two synchronized RGB views. The viewer displays subsampled points in the rendered foreground and applies a fixed similarity alignment to the MVMC result. The rendered reference uses known cameras and independently rendered depth. The colored trails show corresponding points.</p>
-          <figure class="input-preview"><img id="input-view" src="./assets/scenes/whale-cat-input.jpg" alt="One synthetic RGB input for the selected scene" width="504" height="504" loading="lazy"><figcaption>One RGB input view, frame 12.</figcaption></figure>
+          <summary>Scene and reference details</summary>
+          <p id="viewer-annotation">The viewer shows subsampled MVMC point clouds and trajectories. Display alignment and reference data vary by scene.</p>
+          <p><a id="viewer-source-link" href="https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Fox">Scene source</a></p>
         </details>
       </div>
     </section>
@@ -112,7 +112,7 @@
       <div class="wrap">
         <div class="section-intro">
           <h2 id="captures-title">Motion gallery</h2>
-          <p>See point clouds and tracks through object manipulation, articulated motion, and traffic. Open any clip to play and scrub through its reference and prediction.</p>
+          <p>See point clouds and tracks through object manipulation, articulated motion, and traffic. Open a scene to play the clip and scrub through its frames.</p>
         </div>
         <div class="gallery-toolbar">
           <div class="segment" role="group" aria-label="Filter motion gallery" id="gallery-filters">

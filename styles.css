@@ -197,8 +197,6 @@ body:has(.hero) {
 .viewer-notes { margin-top: .85rem; color: var(--muted); }
 .viewer-notes summary, .credits summary { cursor: pointer; width: fit-content; color: var(--blue); font-weight: 620; }
 .viewer-notes p, .credits p { max-width: 76ch; margin-top: .7rem; }
-.input-preview { margin-top: 12px; font-size: .88rem; }
-.input-preview img { width: min(100%, 248px); height: auto; border-radius: 9px; margin-bottom: 4px; }
 
 .studio-section { background: #f7f9fe; border-block: 1px solid var(--line); }
 .studio-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(235px, 27%); gap: 18px; align-items: start; }

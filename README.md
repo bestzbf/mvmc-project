@@ -2,7 +2,7 @@
 
 [Open the interactive website](https://bestzbf.github.io/mvmc-project/) · [MVMC model and code](https://github.com/bestzbf/mvmc)
 
-This project page presents *Multi-View 4D Reconstruction and Tracking from Unposed Multi-Camera Videos*. It includes a highlight reel, five interactive 3D reconstructions, a filterable library of 29 clips, five qualitative comparisons, and the RGB-only multi-camera tracking benchmarks.
+This project page presents *Multi-View 4D Reconstruction and Tracking from Unposed Multi-Camera Videos*. It includes a highlight reel, five interactive 3D reconstructions, a filterable library of 30 clips, five qualitative comparisons, and the RGB-only multi-camera tracking benchmarks.
 
 ## Preview
 
@@ -14,8 +14,8 @@ Start the local server from the repository root.
 
 ## Demo data
 
-- **3D viewer.** The five synthetic examples show MVMC checkpoint 231,100 and an independently rendered reference. Both use input RGB colors, foreground masks for display, and a fixed scene alignment for comparison. Each sequence has 24 frames and six point trajectories. [Scene metadata](assets/scenes/) gives the protocol, credit URLs, and frame indices. The binary point streams use little-endian float32 XYZ and three uint8 RGB values with one padding byte per point.
-- **Motion gallery.** Six clips show real captures and 23 show controlled synthetic scenes. The player keeps the original reference and prediction panels. Separate thumbnails and a highlight reel use cropped previews. [Media credits](assets/licenses/scene-credits.html)
+- **3D viewer.** The fox and robot and train and tram scenes have independently rendered geometry and tracks. The DSEC and HuMMan-Recon scenes have measured depth views. The SceneHub4D couch scene shows predicted depth and trajectories with position-based shading. [Scene metadata](assets/scenes/) gives the display protocol, credit URLs, and frame indices. The binary point streams use little-endian float32 XYZ and three uint8 RGB values with one padding byte per point.
+- **Motion gallery.** Seven clips show real captures and 23 show controlled synthetic scenes. The SceneHub4D clip is rendered from the interactive 3D data. Separate thumbnails and a highlight reel use cropped previews. [Media credits](assets/licenses/scene-credits.html)
 - **Qualitative comparisons.** The interactive panels are crops of the included full figures. Some show trajectories across the full sequence and others overlay tracked points on one frame.
 - **Benchmark results.** The site reproduces Table 1 for MV-Kubric and Panoptic at the reported precision. An em dash marks an unavailable score. [Metric data](metrics.js)
 

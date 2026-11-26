@@ -1,4 +1,4 @@
-import { PointCloudViewer } from './viewer.js';
+import { PointCloudViewer } from './viewer.js?v=4d-scenes';
 import { BENCHMARKS } from './metrics.js';
 import { GALLERY } from './gallery-data.js';
 
@@ -7,12 +7,27 @@ const scenes = './assets/scenes/';
 const gallery = './assets/gallery/';
 const $ = (selector) => document.querySelector(selector);
 
+const couchScene = { id: 'scenehub-couch', title: 'Turning on a couch', frame: 12, dataset: 'SceneHub4D', credit: 'https://scenehub4d.github.io/' };
+
 const studioScenes = [
-  { id: 'whale-cat', title: 'Bronze whale & concrete cat', frame: 5, images: media },
-  { id: 'fox-robot', title: 'Running fox & jumping robot', frame: 15, images: scenes },
-  { id: 'ray-vase', title: 'Bronze ray & ceramic vase', frame: 12, images: media },
-  { id: 'croissant-cupcake', title: 'Croissant & iced cupcake', frame: 20, images: scenes },
-  { id: 'wheel-statue', title: 'Spinning wheel & Gothic statue', frame: 8, images: scenes },
+  { id: 'fox-robot', title: 'Running fox & jumping robot', frame: 15, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Fox' },
+  { id: 'train-tram', title: 'Steam train passing a tram', frame: 12, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://kenney.nl/assets/train-kit' },
+  { id: 'zurich-night', title: 'Oncoming traffic at night', frame: 8, dataset: 'DSEC', reference: 'LiDAR-derived depth', frames: 12, interval: 200, credit: 'https://dsec.ifi.uzh.ch/' },
+  { id: 'humman-knee', title: 'Squat and knee lift', frame: 13, dataset: 'HuMMan-Recon', reference: 'Kinect depth', credit: 'https://huggingface.co/datasets/caizhongang/HuMMan/tree/main/humman_release_v1.0_recon' },
+  couchScene,
+];
+
+const galleryClips = [
+  {
+    id: couchScene.id,
+    title: couchScene.title,
+    dataset: couchScene.dataset,
+    category: 'articulated',
+    real: true,
+    movie: gallery + couchScene.id + '.mp4',
+    note: 'MVMC predicts the surface and tracked points from two synchronized RGB views. Surface shading comes from the reconstructed 3D coordinates.',
+  },
+  ...GALLERY,
 ];
 
 const comparisons = [
@@ -91,7 +106,7 @@ function initMovies() {
   }
 
   function showCategory(filter) {
-    playlist = GALLERY.filter((clip) => filter === 'all' || (filter === 'real' ? clip.real : clip.category === filter));
+    playlist = galleryClips.filter((clip) => filter === 'all' || (filter === 'real' ? clip.real : clip.category === filter));
     const content = document.createDocumentFragment();
     playlist.forEach((clip, at) => {
       const card = sceneButton(clip, gallery + clip.id + '-thumb.webp', () => playClip(at));
@@ -269,6 +284,8 @@ function initViewer() {
   const status = $('#viewer-status');
   const bottom = $('#viewer-bottom');
   const overlays = $('#viewer-overlays');
+  const sourceControls = overlays.querySelector('.viewer-source');
+  const reference = overlays.querySelector('[data-cloud="reference"]');
   const seek = $('#scene-time');
   const play = $('#play-scene');
   const tracks = $('#show-trails');
@@ -277,6 +294,7 @@ function initViewer() {
   let id;
   let source;
   let requestedSource;
+  let activeScene;
   let loaded;
   let generation = 0;
   let timer;
@@ -298,9 +316,8 @@ function initViewer() {
     stopPlayback();
     if (asset) {
       const scene = studioScenes.find((item) => item.id === asset);
-      poster.src = scene.images + asset + '-preview.webp';
-      poster.alt = scene.title + ' reconstructed from two camera views';
-      $('#input-view').src = scenes + asset + '-input.jpg';
+      poster.src = scenes + asset + '-preview.webp';
+      poster.alt = 'MVMC preview of ' + scene.title;
     }
     poster.hidden = false;
     canvas.hidden = true;
@@ -336,7 +353,7 @@ function initViewer() {
     if (requested === 'reference' && !entry.reference) {
       entry.reference = fetchData(scenes + asset + '-reference.bin', 'arrayBuffer');
     }
-    message(requested === 'reference' ? 'Loading the rendered reference…' : 'Loading the 3D scene…');
+    message(requested === 'reference' ? 'Loading ' + activeScene.reference.toLowerCase() + '…' : 'Loading the 3D scene…');
     try {
       const [meta, binary] = await Promise.all([entry.meta, entry[requested]]);
       if (current !== generation) return;
@@ -346,7 +363,8 @@ function initViewer() {
         throw new Error('The point cloud data is incomplete');
       }
       renderer.load(meta, binary, frames, paths, reset);
-      renderer.showTrajectories(tracks.checked);
+      tracks.disabled = paths.length === 0;
+      renderer.showTrajectories(tracks.checked && !tracks.disabled);
       loaded = frames;
       source = requested;
       requestedSource = null;
@@ -356,6 +374,8 @@ function initViewer() {
       poster.hidden = true;
       seek.max = frames.length;
       $('#viewer-scene-context').textContent = frames.length + ' frames';
+      $('#viewer-annotation').textContent = meta.notes;
+      sourceControls.hidden = !activeScene.reference;
       setFrame(Math.min(frame, frames.length - 1));
       setPressed(overlays, 'cloud', source);
       message('');
@@ -365,7 +385,7 @@ function initViewer() {
       if (current !== generation) return;
       requestedSource = null;
       if (reset) showFallback(asset, 'The point cloud could not load. Choose a scene to try again.');
-      else message('The rendered reference could not load. Select it to try again.');
+      else message('The reference could not load. Select it to try again.');
     }
   }
 
@@ -377,19 +397,25 @@ function initViewer() {
 
   function chooseScene(scene) {
     if (id === scene.id && loaded) return;
+    activeScene = scene;
     id = scene.id;
     loaded = null;
     frame = scene.frame - 1;
     source = 'predicted';
     $('#viewer-scene-name').textContent = scene.title;
+    $('#viewer-scene-context').textContent = (scene.frames ?? 24) + ' frames';
+    $('#viewer-annotation').textContent = 'The viewer displays subsampled MVMC geometry and predicted trajectories.';
+    $('#viewer-source-link').href = scene.credit;
+    $('#viewer-source-link').textContent = scene.dataset === 'Synthetic' ? 'Scene assets' : scene.dataset + ' dataset';
+    reference.textContent = scene.reference ?? '';
+    reference.hidden = !scene.reference;
     setPressed(picker, 'scene', id);
     showFallback(id, renderer ? 'Loading the 3D scene…' : 'WebGL is unavailable. A rendered preview is shown.');
     if (renderer) selectCloud(source, true);
   }
 
   for (const scene of studioScenes) {
-    const suffix = scene.images === media ? '-thumb.webp' : '-preview.webp';
-    picker.append(sceneButton(scene, scene.images + scene.id + suffix, chooseScene));
+    picker.append(sceneButton(scene, scenes + scene.id + '-preview.webp', chooseScene));
   }
   chooseScene(studioScenes[0]);
   if (!renderer) return;
@@ -405,7 +431,7 @@ function initViewer() {
     }
     play.setAttribute('aria-pressed', 'true');
     play.setAttribute('aria-label', 'Pause 3D scene');
-    timer = setInterval(() => setFrame((frame + 1) % loaded.length), 125);
+    timer = setInterval(() => setFrame((frame + 1) % loaded.length), activeScene.interval ?? 125);
   });
   overlays.addEventListener('click', (event) => {
     const button = event.target.closest('[data-cloud]');
