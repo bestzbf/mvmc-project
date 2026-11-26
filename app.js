@@ -1,33 +1,26 @@
 import { PointCloudViewer } from './viewer.js';
 import { BENCHMARKS } from './metrics.js';
+import { GALLERY } from './gallery-data.js';
 
 const media = './assets/media/';
 const scenes = './assets/scenes/';
+const gallery = './assets/gallery/';
 const $ = (selector) => document.querySelector(selector);
 
-const realClips = [
-  {
-    id: 'hoi', dataset: 'Hoi!', title: 'Opening a storage bench',
-    note: 'Two synchronized iPhone views. The reference uses device depth. Colored tracks are MVMC predictions.',
-  },
-  {
-    id: 'humman-knee', dataset: 'HuMMan-Recon', title: 'Squat and knee lift',
-    note: 'Two Kinect views with a shared subject mask. Measured depth supplies the reference reconstruction; trails show MVMC predictions.',
-  },
-  {
-    id: 'humman-step', dataset: 'HuMMan-Recon', title: 'Squat, rise, and step',
-    note: 'A different viewpoint pair captures the transition from a squat to walking. Measured depth supplies the reference and the colored trails show predicted motion.',
-  },
-  {
-    id: 'dsec', dataset: 'DSEC', title: 'Crossing a Zurich junction',
-    note: 'Stereo RGB during a vehicle turn. The reference uses LiDAR-derived depth at available pixels. The projected tracks come from MVMC.',
-  },
+const studioScenes = [
+  { id: 'whale-cat', title: 'Bronze whale & concrete cat', frame: 5, images: media },
+  { id: 'fox-robot', title: 'Running fox & jumping robot', frame: 15, images: scenes },
+  { id: 'ray-vase', title: 'Bronze ray & ceramic vase', frame: 12, images: media },
+  { id: 'croissant-cupcake', title: 'Croissant & iced cupcake', frame: 20, images: scenes },
+  { id: 'wheel-statue', title: 'Spinning wheel & Gothic statue', frame: 8, images: scenes },
 ];
 
 const comparisons = [
   { id: 'whale-cat', title: 'Bronze whale & concrete cat', frame: 20 },
   { id: 'ray-vase', title: 'Bronze ray & ceramic vase', frame: 20 },
   { id: 'wheel-statue', title: 'Spinning wheel & Gothic statue', frame: 8 },
+  { id: 'croissant-cupcake', title: 'Croissant & iced cupcake', frame: 20, combined: true },
+  { id: 'produce', title: 'Pomegranate & pumpkin', frame: 20, combined: true },
 ];
 
 const methods = {
@@ -72,22 +65,96 @@ function sceneButton(item, preview, select) {
 function initMovies() {
   const video = $('#real-video');
   const list = $('#video-scenes');
-  let active = realClips[0].id;
-  for (const item of realClips) {
-    list.append(sceneButton(item, media + item.id + '-thumb.webp', (clip) => {
-      if (active === clip.id) return;
-      active = clip.id;
-      setPressed(list, 'scene', active);
-      video.pause();
-      video.poster = media + active + '-poster.webp';
-      video.src = media + active + '.mp4';
-      video.setAttribute('aria-label', clip.title + ' on the ' + clip.dataset + ' dataset');
-      $('#film-dataset').textContent = clip.dataset;
-      $('#film-title').textContent = clip.title;
-      $('#film-note').textContent = clip.note;
-    }));
+  const filters = $('#gallery-filters');
+  const dialog = $('#clip-dialog');
+  const previous = $('#previous-clip');
+  const next = $('#next-clip');
+  let playlist = [];
+  let index = 0;
+
+  function playClip(at) {
+    if (at < 0 || at >= playlist.length) return;
+    index = at;
+    const clip = playlist[index];
+    video.pause();
+    video.poster = gallery + clip.id + '-poster.webp';
+    video.src = clip.movie;
+    video.setAttribute('aria-label', clip.title);
+    $('#film-dataset').textContent = clip.dataset;
+    $('#film-title').textContent = clip.title;
+    $('#film-note').textContent = clip.note;
+    $('#film-position').textContent = (index + 1) + ' / ' + playlist.length;
+    previous.disabled = index === 0;
+    next.disabled = index === playlist.length - 1;
+    if (!dialog.open) dialog.showModal();
+    video.play().catch(() => {});
   }
-  setPressed(list, 'scene', active);
+
+  function showCategory(filter) {
+    playlist = GALLERY.filter((clip) => filter === 'all' || (filter === 'real' ? clip.real : clip.category === filter));
+    const content = document.createDocumentFragment();
+    playlist.forEach((clip, at) => {
+      const card = sceneButton(clip, gallery + clip.id + '-thumb.webp', () => playClip(at));
+      card.removeAttribute('aria-pressed');
+      card.setAttribute('aria-haspopup', 'dialog');
+      const thumbnail = card.querySelector('img');
+      const preview = document.createElement('div');
+      preview.className = 'gallery-thumbnail';
+      card.prepend(preview);
+      preview.append(thumbnail);
+      content.append(card);
+    });
+    list.replaceChildren(content);
+    $('#gallery-count').textContent = playlist.length + ' scenes';
+    setPressed(filters, 'filter', filter);
+  }
+
+  filters.addEventListener('click', (event) => {
+    const filter = event.target.closest('[data-filter]')?.dataset.filter;
+    if (filter) showCategory(filter);
+  });
+  previous.addEventListener('click', () => playClip(index - 1));
+  next.addEventListener('click', () => playClip(index + 1));
+  $('#close-clip').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+  dialog.addEventListener('close', () => {
+    video.pause();
+    video.removeAttribute('src');
+    video.load();
+  });
+  showCategory('all');
+}
+
+function initShowreel() {
+  const reel = $('#showreel-video');
+  const control = $('#reel-control');
+  reel.controls = false;
+  control.hidden = false;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    reel.autoplay = false;
+    reel.pause();
+  }
+  const reflectPlayback = () => {
+    control.textContent = reel.paused ? 'Play preview' : 'Pause preview';
+  };
+  reel.addEventListener('play', reflectPlayback);
+  reel.addEventListener('pause', reflectPlayback);
+  control.addEventListener('click', () => {
+    if (reel.paused) reel.play().catch(reflectPlayback);
+    else reel.pause();
+  });
+  reflectPlayback();
+  let resume = false;
+  new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting) {
+      resume = !reel.paused;
+      reel.pause();
+    } else if (resume) {
+      reel.play().catch(() => {});
+    }
+  }, { threshold: 0.15 }).observe(reel);
 }
 
 function initComparisons() {
@@ -102,15 +169,20 @@ function initComparisons() {
   let panel = 'geometry';
 
   function updatePanels() {
+    kind.hidden = Boolean(active.combined);
+    const view = active.combined ? 'geometry' : panel;
+    stage.dataset.display = active.combined ? 'overlaid' : 'split';
     for (const [side, method] of [['left', left.value], ['right', right.value]]) {
       const image = $('#compare-' + side + '-img');
-      image.src = media + [active.id, method, panel].join('-') + '.webp';
-      image.alt = methods[method] + ' ' + (panel === 'geometry' ? 'point cloud' : 'point trajectories') + ' for ' + active.title;
+      image.src = media + [active.id, method, view].join('-') + '.webp';
+      image.alt = methods[method] + ' ' + (view === 'geometry' ? 'point cloud' : 'point trajectories') + ' for ' + active.title;
     }
-    stage.dataset.kind = panel;
-    $('#compare-note').textContent = panel === 'geometry'
-      ? 'Frame ' + active.frame + ' under the same display projection. The full figure shows alignment and per-scene errors.'
-      : 'Six corresponding points over the full clip. Trajectories share their rendered starting points; faint lines show the reference motion.';
+    stage.dataset.kind = view;
+    let note;
+    if (active.combined) note = 'Frame ' + active.frame + ' with tracked points overlaid on the reconstruction. The full figure reports the per-scene errors.';
+    else if (view === 'geometry') note = 'Frame ' + active.frame + ' under the same display projection. The full figure shows alignment and per-scene errors.';
+    else note = 'Six corresponding points over the full clip. Trajectories share their rendered starting points; faint lines show the reference motion.';
+    $('#compare-note').textContent = note;
     $('#full-comparison').href = media + active.id + '-comparison.webp';
   }
 
@@ -191,7 +263,7 @@ async function fetchData(url, format) {
 }
 
 function initViewer() {
-  const picker = $('#scene');
+  const picker = $('#studio-scenes');
   const canvas = $('#scene-canvas');
   const poster = $('#viewer-poster');
   const status = $('#viewer-status');
@@ -225,8 +297,9 @@ function initViewer() {
   function showFallback(asset, description) {
     stopPlayback();
     if (asset) {
-      poster.src = media + asset + '-preview.webp';
-      poster.alt = picker.selectedOptions[0].text + ' reconstructed from two camera views';
+      const scene = studioScenes.find((item) => item.id === asset);
+      poster.src = scene.images + asset + '-preview.webp';
+      poster.alt = scene.title + ' reconstructed from two camera views';
       $('#input-view').src = scenes + asset + '-input.jpg';
     }
     poster.hidden = false;
@@ -282,6 +355,7 @@ function initViewer() {
       overlays.hidden = false;
       poster.hidden = true;
       seek.max = frames.length;
+      $('#viewer-scene-context').textContent = frames.length + ' frames';
       setFrame(Math.min(frame, frames.length - 1));
       setPressed(overlays, 'cloud', source);
       message('');
@@ -298,22 +372,27 @@ function initViewer() {
   try {
     renderer = new PointCloudViewer(canvas);
   } catch {
-    showFallback(picker.value, 'WebGL is unavailable. A rendered preview is shown.');
-    picker.addEventListener('change', () => showFallback(picker.value, 'WebGL is unavailable. A rendered preview is shown.'));
-    return;
+    renderer = null;
   }
 
-  function chooseScene() {
-    id = picker.value;
+  function chooseScene(scene) {
+    if (id === scene.id && loaded) return;
+    id = scene.id;
     loaded = null;
-    frame = id === 'whale-cat' ? 4 : 11;
+    frame = scene.frame - 1;
     source = 'predicted';
-    showFallback(id, 'Loading the 3D scene…');
-    selectCloud(source, true);
+    $('#viewer-scene-name').textContent = scene.title;
+    setPressed(picker, 'scene', id);
+    showFallback(id, renderer ? 'Loading the 3D scene…' : 'WebGL is unavailable. A rendered preview is shown.');
+    if (renderer) selectCloud(source, true);
   }
 
-  picker.addEventListener('change', chooseScene);
-  chooseScene();
+  for (const scene of studioScenes) {
+    const suffix = scene.images === media ? '-thumb.webp' : '-preview.webp';
+    picker.append(sceneButton(scene, scene.images + scene.id + suffix, chooseScene));
+  }
+  chooseScene(studioScenes[0]);
+  if (!renderer) return;
   seek.addEventListener('input', () => {
     stopPlayback();
     setFrame(Number(seek.value) - 1);
@@ -335,6 +414,22 @@ function initViewer() {
   $('#zoom-in').addEventListener('click', () => renderer.zoom(.83));
   $('#zoom-out').addEventListener('click', () => renderer.zoom(1.2));
   $('#reset-camera').addEventListener('click', () => renderer.reset());
+  const expand = $('#expand-viewer');
+  const container = canvas.closest('.viewer');
+  if (document.fullscreenEnabled && container.requestFullscreen) {
+    expand.hidden = false;
+    expand.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement === container) await document.exitFullscreen();
+        else await container.requestFullscreen();
+      } catch {
+        message('Full screen is unavailable in this browser.');
+      }
+    });
+    document.addEventListener('fullscreenchange', () => {
+      expand.textContent = document.fullscreenElement === container ? 'Exit full screen' : 'Full screen';
+    });
+  }
   new IntersectionObserver(([entry]) => {
     if (!entry.isIntersecting) stopPlayback();
   }).observe(canvas.parentElement);
@@ -348,6 +443,7 @@ function initViewer() {
 }
 
 initMovies();
+initShowreel();
 initComparisons();
 initBenchmarks();
 initViewer();

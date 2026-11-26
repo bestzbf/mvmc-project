@@ -1,0 +1,37 @@
+{
+  "clips": [
+    {"id": "cat-owl", "archive": 37, "category": "articulated", "title": "Cat leaping beside an owl", "layout": "pair"},
+    {"id": "dsec", "real": 4, "category": "vehicles", "title": "Crossing a Zurich junction", "dataset": "DSEC", "layout": "road", "note": "Stereo RGB at a road junction. The reference uses depth derived from the posted disparity. The projected tracks come from MVMC."},
+    {"id": "train-tram", "archive": 45, "category": "vehicles", "title": "Steam train passing a tram", "layout": "inputs"},
+    {"id": "croissant-cupcake", "archive": 47, "category": "objects", "title": "Sliding croissant and turning cupcake", "layout": "pair"},
+    {"id": "robot-dragon", "archive": 33, "category": "articulated", "title": "Dancing robot and flying dragon", "layout": "pair"},
+    {"id": "humman-leg", "real": 6, "category": "articulated", "title": "Standing side-leg raise", "dataset": "HuMMan-Recon", "layout": "capture", "note": "Two Kinect viewpoints capture a side-leg raise. Measured depth provides the reference geometry; the trails show MVMC predictions."},
+    {"id": "mars-flight", "archive": 46, "category": "vehicles", "title": "Mars rover and lifting helicopter", "layout": "inputs"},
+    {"id": "hoi", "real": 1, "category": "objects", "title": "Opening a storage bench", "dataset": "Hoi!", "layout": "capture", "note": "Two synchronized iPhone views. The reference uses device depth. Colored tracks are MVMC predictions."},
+    {"id": "zurich-night", "real": 7, "category": "vehicles", "title": "Oncoming traffic at night", "dataset": "DSEC", "layout": "road", "note": "Rectified stereo RGB from a night drive in Zurich. Sparse reference depth comes from the published disparity where valid. The upper-right panel shows reprojected MVMC tracks."},
+    {"id": "owl-backpack", "archive": 34, "category": "objects", "title": "Spinning toy owl and tilting backpack", "layout": "pair"},
+    {"id": "elephant-hedgehog", "archive": 40, "category": "articulated", "title": "Elephant passing a hedgehog", "layout": "pair"},
+    {"id": "tractor-taxi", "archive": 50, "category": "vehicles", "title": "Loader crossing a turning taxi", "layout": "inputs"},
+    {"id": "humman-knee", "real": 2, "category": "articulated", "title": "Squat and knee lift", "dataset": "HuMMan-Recon", "layout": "capture", "note": "Two Kinect views with a shared subject mask. Measured depth supplies the reference reconstruction; trails show MVMC predictions."},
+    {"id": "binoculars-vase", "archive": 31, "category": "objects", "title": "Binoculars and tilting vase", "layout": "pair"},
+    {"id": "crab-penguin", "archive": 36, "category": "articulated", "title": "Sidestepping crab and dancing penguin", "layout": "pair"},
+    {"id": "humman-step", "real": 3, "category": "articulated", "title": "Squat, rise, and step", "dataset": "HuMMan-Recon", "layout": "capture", "note": "A different viewpoint pair captures the transition from a squat to walking. Measured depth supplies the reference and the colored trails show predicted motion."},
+    {"id": "chair-whale", "archive": 30, "category": "objects", "title": "Turning chair and banking whale", "layout": "pair"},
+    {"id": "swan-frog", "archive": 41, "category": "articulated", "title": "Turning swan and crawling frog", "layout": "pair"},
+    {"id": "toycar-avocado", "archive": 26, "category": "objects", "title": "Toy car passing an avocado", "layout": "pair"},
+    {"id": "tower-drawbridge", "archive": 38, "category": "vehicles", "title": "Moving tower and falling drawbridge", "layout": "inputs"},
+    {"id": "figure-fox", "archive": 32, "category": "articulated", "title": "Walking figure and trotting fox", "layout": "pair"},
+    {"id": "kettle-plate", "archive": 29, "category": "objects", "title": "Kettle occluding a carved plate", "layout": "pair"},
+    {"id": "knight-jump", "archive": 39, "category": "articulated", "title": "One knight sits, one jumps", "layout": "pair"},
+    {"id": "crossing-boats", "archive": 35, "category": "vehicles", "title": "Three boats crossing a harbor", "layout": "inputs"},
+    {"id": "burger-pot", "archive": 48, "category": "objects", "title": "Turning burger and tilting pot", "layout": "pair"},
+    {"id": "horse-boar", "archive": 42, "category": "articulated", "title": "Horse and boar passing", "layout": "pair"},
+    {"id": "fox-and-walker", "archive": 43, "category": "articulated", "title": "Walking figure and looking fox", "layout": "pair"},
+    {"id": "dino-crossing", "archive": 44, "category": "articulated", "title": "Two dinosaurs on a sandbar", "layout": "pair"},
+    {"id": "salad-taco", "archive": 49, "category": "objects", "title": "Turning salad and sliding taco", "layout": "pair"}
+  ],
+  "showreel": [
+    ["cat-owl", "dsec", "train-tram", "croissant-cupcake"],
+    ["robot-dragon", "hoi", "tractor-taxi", "owl-backpack"]
+  ]
+}

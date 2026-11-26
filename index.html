@@ -24,7 +24,7 @@
       <a href="./" class="wordmark"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>MVMC</a>
       <nav aria-label="Sections">
         <a href="#viewer">4D viewer</a>
-        <a href="#captures">Real scenes</a>
+        <a href="#captures">Motion gallery</a>
         <a href="#comparisons">Comparisons</a>
         <a href="#results">Results</a>
         <a href="#method">Method</a>
@@ -41,17 +41,32 @@
         <p class="hero-summary">MVMC reconstructs a moving scene in 3D and follows points across time and cameras from synchronized RGB.</p>
         <div class="hero-actions">
           <a href="#viewer" class="button primary">Explore in 3D</a>
-          <a href="#results" class="button outline">View results</a>
+          <a href="#captures" class="button outline">Browse scenes</a>
         </div>
       </div>
-      <div class="viewer" id="viewer" aria-labelledby="viewer-title">
+      <figure class="showreel">
+        <video id="showreel-video" class="showreel-video" src="./assets/gallery/showreel.mp4" poster="./assets/gallery/showreel-poster.webp" muted autoplay playsinline loop controls preload="metadata" aria-label="Preview of real and synthetic MVMC reconstructions"></video>
+        <figcaption>
+          <span>Reconstruction and motion across real and synthetic scenes</span>
+          <button class="reel-control" id="reel-control" type="button" hidden>Pause preview</button>
+        </figcaption>
+      </figure>
+    </section>
+
+    <section class="section studio-section" id="viewer" aria-labelledby="viewer-title">
+      <div class="wrap">
+        <div class="section-intro">
+          <h2 id="viewer-title">Explore in 3D</h2>
+          <p>Rotate a scene while it moves. Scrub the timeline, follow a point, and switch between MVMC and the rendered reference from the same viewpoint.</p>
+        </div>
+        <div class="studio-layout">
+          <div class="viewer" aria-label="Interactive 4D viewer">
         <div class="viewer-head">
-          <h2 id="viewer-title">Interactive 4D viewer</h2>
-          <label class="sr-only" for="scene">3D scene</label>
-          <select id="scene">
-            <option value="whale-cat">Bronze whale &amp; concrete cat</option>
-            <option value="ray-vase">Bronze ray &amp; ceramic vase</option>
-          </select>
+          <h3 id="viewer-scene-name">Bronze whale &amp; concrete cat</h3>
+          <div class="viewer-meta">
+            <span id="viewer-scene-context">24 frames</span>
+            <button id="expand-viewer" type="button" hidden>Full screen</button>
+          </div>
         </div>
         <div class="viewer-stage" id="viewer-stage">
           <img class="viewer-poster" id="viewer-poster" src="./assets/media/whale-cat-preview.webp" alt="Bronze whale and concrete cat reconstructed from two camera views" fetchpriority="high" width="800" height="550">
@@ -81,37 +96,56 @@
             <label class="track-switch"><input id="show-trails" type="checkbox" checked>Trajectories</label>
           </div>
         </div>
-        <noscript><p class="no-js">The 3D viewer uses JavaScript. The real-scene video and benchmark table are available below.</p></noscript>
-      </div>
-      <div class="hero-meta">
-        <p class="authors">Binfeng Zou<sup>1</sup>, Qi Xu<sup>2</sup>, Jiagang Chen<sup>3</sup>, Yihao Guo<sup>1</sup>, Qihang Xu<sup>4</sup>, Zhiwen Zheng<sup>1</sup>, Xingru Huang<sup>1</sup>, Jin Liu<sup>1</sup></p>
-        <p class="affiliations"><span><sup>1</sup> Hangzhou Dianzi University</span><span><sup>2</sup> Westlake University</span><span><sup>3</sup> Wuhan University</span><span><sup>4</sup> Tongji University</span></p>
+        <noscript><p class="no-js">The 3D controls use JavaScript.</p></noscript>
+          </div>
+          <div class="studio-scenarios" id="studio-scenes" role="group" aria-label="3D scenes"></div>
+        </div>
         <details class="viewer-notes">
           <summary>How the 3D scenes are displayed</summary>
-          <p>These two synthetic scenes use two synchronized RGB views and 24 observed times. The viewer displays subsampled points in the rendered foreground and applies one fixed similarity alignment to the MVMC result. The rendered reference uses known cameras and independent rendered depth. Colored trails show six corresponding points.</p>
+          <p>The synthetic scenes use two synchronized RGB views. The viewer displays subsampled points in the rendered foreground and applies a fixed similarity alignment to the MVMC result. The rendered reference uses known cameras and independently rendered depth. The colored trails show corresponding points.</p>
           <figure class="input-preview"><img id="input-view" src="./assets/scenes/whale-cat-input.jpg" alt="One synthetic RGB input for the selected scene" width="504" height="504" loading="lazy"><figcaption>One RGB input view, frame 12.</figcaption></figure>
         </details>
       </div>
     </section>
 
-    <section id="captures" class="section captures-section" aria-labelledby="captures-title">
+    <section id="captures" class="section gallery-section" aria-labelledby="captures-title">
       <div class="wrap">
         <div class="section-intro">
-          <h2 id="captures-title">Real-world sequences</h2>
-          <p>Watch reconstruction and tracks across hand–object interaction, human motion, and driving scenes. Each clip includes its reference depth and its display protocol.</p>
+          <h2 id="captures-title">Motion gallery</h2>
+          <p>See point clouds and tracks through object manipulation, articulated motion, and traffic. Open any clip to play and scrub through its reference and prediction.</p>
         </div>
+        <div class="gallery-toolbar">
+          <div class="segment" role="group" aria-label="Filter motion gallery" id="gallery-filters">
+            <button type="button" data-filter="all" aria-pressed="true">All</button>
+            <button type="button" data-filter="real" aria-pressed="false">Real captures</button>
+            <button type="button" data-filter="articulated" aria-pressed="false">Articulated motion</button>
+            <button type="button" data-filter="objects" aria-pressed="false">Objects</button>
+            <button type="button" data-filter="vehicles" aria-pressed="false">Vehicles</button>
+          </div>
+          <span id="gallery-count" aria-live="polite"></span>
+        </div>
+        <div class="gallery-grid" id="video-scenes" role="group" aria-label="Motion scenes"></div>
+        <noscript><p class="gallery-noscript">The <a href="./assets/gallery/showreel.mp4">showreel</a> and <a href="./assets/media/hoi.mp4">Hoi! sequence</a> are also available as videos.</p></noscript>
+      </div>
+      <dialog id="clip-dialog" class="clip-dialog" aria-labelledby="film-title">
         <div class="film">
           <div class="film-header">
-            <span class="dataset-label" id="film-dataset">Hoi!</span>
-            <h3 id="film-title">Opening a storage bench</h3>
+            <div>
+              <p class="dataset-label" id="film-dataset"></p>
+              <h3 id="film-title"></h3>
+            </div>
+            <button class="film-close" type="button" id="close-clip">Close</button>
           </div>
-          <video id="real-video" controls playsinline loop preload="none" poster="./assets/media/hoi-poster.webp" src="./assets/media/hoi.mp4" aria-label="Opening a storage bench on the Hoi! dataset">
-            <a href="./assets/media/hoi.mp4">Download the Hoi! clip</a>
+          <video id="real-video" controls playsinline loop preload="none" aria-label="Selected motion sequence">
           </video>
-          <p class="film-note" id="film-note">Two synchronized iPhone views. The reference uses device depth. Colored tracks are MVMC predictions.</p>
+          <p class="film-note" id="film-note"></p>
+          <div class="film-actions">
+            <button type="button" id="previous-clip">Previous clip</button>
+            <span id="film-position" aria-live="polite"></span>
+            <button type="button" id="next-clip">Next clip</button>
+          </div>
         </div>
-        <div class="scene-grid" id="video-scenes" role="group" aria-label="Real-world video"></div>
-      </div>
+      </dialog>
     </section>
 
     <section id="comparisons" class="section wrap" aria-labelledby="comparisons-title">
@@ -211,8 +245,8 @@
       </div>
       <details class="credits" id="credits">
         <summary>Sources and credits</summary>
-        <p>Edited Hoi! clips use <a href="https://hoi-dataset.ethz.ch/">the Hoi! dataset</a> under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Edited driving footage uses <a href="https://dsec.ifi.uzh.ch/">the DSEC dataset</a> and is shared under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. HuMMan-Recon clips use <a href="https://huggingface.co/datasets/caizhongang/HuMMan">HuMMan by Cai et al.</a> under the <a href="./assets/licenses/humman.txt">S-Lab License 1.0</a> for non-commercial research. The clips were trimmed and annotated to show reconstruction and point tracking.</p>
-        <p>The synthetic scenes use <a href="https://polyhaven.com/license">Poly Haven (CC0)</a> assets, including the <a href="https://polyhaven.com/a/bronze_whale_statue">bronze whale</a>, <a href="https://polyhaven.com/a/concrete_cat_statue">concrete cat</a>, <a href="https://polyhaven.com/a/bronze_ray_statue">bronze ray</a>, <a href="https://polyhaven.com/a/ceramic_vase_04">ceramic vase</a>, <a href="https://polyhaven.com/a/spinning_wheel_01">spinning wheel</a>, and <a href="https://polyhaven.com/a/gothic_statue">Gothic statue</a>. Benchmarks use the <a href="https://ethz-vlg.github.io/mvtracker/">MVTracker</a> protocol on <a href="http://domedb.perception.cs.cmu.edu/">CMU Panoptic Studio</a> and MV-Kubric.</p>
+        <p>Edited Hoi! clips use <a href="https://hoi-dataset.ethz.ch/">the Hoi! dataset</a> under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Edited driving footage uses <a href="https://dsec.ifi.uzh.ch/">the DSEC dataset</a> and is shared under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>. HuMMan-Recon clips use <a href="https://huggingface.co/datasets/caizhongang/HuMMan">the HuMMan dataset</a> under the <a href="./assets/licenses/humman.txt">S-Lab License 1.0</a> for non-commercial research. The clips were trimmed and annotated to show reconstruction and point tracking.</p>
+        <p>See <a href="./assets/licenses/scene-credits.html">source credits for the rendered scenes</a>. Benchmarks use the <a href="https://ethz-vlg.github.io/mvtracker/">MVTracker</a> protocol on <a href="http://domedb.perception.cs.cmu.edu/">Panoptic Studio</a> and MV-Kubric.</p>
       </details>
     </div>
   </footer>
