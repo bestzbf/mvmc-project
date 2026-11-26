@@ -1,4 +1,4 @@
-import { PointCloudViewer } from './viewer.js?v=real-scenes';
+import { PointCloudViewer } from './viewer.js?v=fan-focus';
 import { BENCHMARKS } from './metrics.js';
 import { GALLERY } from './gallery-data.js';
 
@@ -18,7 +18,7 @@ const couchScene = {
 
 const studioScenes = [
   { id: 'n3dv-flame-salmon', title: 'Flambéing salmon', frame: 19, dataset: 'N3DV', credit: 'https://github.com/facebookresearch/Neural_3D_Video', revision: '?v=static-bg' },
-  { id: 'sjtu-fan-dance', title: 'Fan dance with a step off a stool', frame: 11, dataset: 'SJTU Free Viewpoint', credit: 'https://medialab.sjtu.edu.cn/post/free-viewpoint-rgb-d-video-dataset/' },
+  { id: 'sjtu-fan-dance', title: 'Fan dance with a step off a stool', frame: 1, dataset: 'SJTU Free Viewpoint', credit: 'https://medialab.sjtu.edu.cn/post/free-viewpoint-rgb-d-video-dataset/', revision: '?v=fan-focus' },
   { id: 'sjtu-football', title: 'Two-player football pass', frame: 13, dataset: 'SJTU Free Viewpoint', credit: 'https://medialab.sjtu.edu.cn/post/free-viewpoint-rgb-d-video-dataset/' },
   { id: 'hdr-tumbler', title: 'Rotating a tumbler by hand', frame: 13, dataset: 'HDR-GoPro', credit: 'https://huggingface.co/datasets/SHlNDY/HDR-NSFF' },
   { id: 'ucsd-courtyard', title: 'Walking across a courtyard', frame: 13, dataset: 'UCSD Dynamic', credit: 'https://cseweb.ucsd.edu/~viscomp/projects/ICCV21Deep/' },

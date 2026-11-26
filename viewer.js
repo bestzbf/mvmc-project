@@ -145,8 +145,9 @@ export class PointCloudViewer {
 
   turn(x, y) {
     if (!this.meta) return;
-    this.azimuth += x;
-    this.elevation = clamp(this.elevation + y, -1.43, 1.43);
+    const { azimuthRange, elevationRange } = this.meta.orbit;
+    this.azimuth = azimuthRange ? clamp(this.azimuth + x, ...azimuthRange) : this.azimuth + x;
+    this.elevation = clamp(this.elevation + y, ...(elevationRange ?? [-1.43, 1.43]));
     this.draw();
   }
 
