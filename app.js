@@ -1,4 +1,4 @@
-import { PointCloudViewer } from './viewer.js?v=4d-scenes';
+import { PointCloudViewer } from './viewer.js?v=rgb-n3dv';
 import { BENCHMARKS } from './metrics.js';
 import { GALLERY } from './gallery-data.js';
 
@@ -7,7 +7,14 @@ const scenes = './assets/scenes/';
 const gallery = './assets/gallery/';
 const $ = (selector) => document.querySelector(selector);
 
-const couchScene = { id: 'scenehub-couch', title: 'Turning on a couch', frame: 12, dataset: 'SceneHub4D', credit: 'https://scenehub4d.github.io/' };
+const couchScene = {
+  id: 'scenehub-couch',
+  title: 'Turning on a couch',
+  frame: 12,
+  dataset: 'SceneHub4D',
+  credit: 'https://scenehub4d.github.io/',
+  revision: '?v=rgb',
+};
 
 const studioScenes = [
   { id: 'fox-robot', title: 'Running fox & jumping robot', frame: 15, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Fox' },
@@ -15,6 +22,7 @@ const studioScenes = [
   { id: 'zurich-night', title: 'Oncoming traffic at night', frame: 8, dataset: 'DSEC', reference: 'LiDAR-derived depth', frames: 12, interval: 200, credit: 'https://dsec.ifi.uzh.ch/' },
   { id: 'humman-knee', title: 'Squat and knee lift', frame: 13, dataset: 'HuMMan-Recon', reference: 'Kinect depth', credit: 'https://huggingface.co/datasets/caizhongang/HuMMan/tree/main/humman_release_v1.0_recon' },
   couchScene,
+  { id: 'n3dv-flame-salmon', title: 'Flambéing salmon', frame: 11, dataset: 'N3DV', credit: 'https://github.com/facebookresearch/Neural_3D_Video' },
 ];
 
 const galleryClips = [
@@ -22,10 +30,11 @@ const galleryClips = [
     id: couchScene.id,
     title: couchScene.title,
     dataset: couchScene.dataset,
+    revision: couchScene.revision,
     category: 'articulated',
     real: true,
-    movie: gallery + couchScene.id + '.mp4',
-    note: 'MVMC predicts the surface and tracked points from two synchronized RGB views. Surface shading comes from the reconstructed 3D coordinates.',
+    movie: gallery + couchScene.id + '.mp4' + couchScene.revision,
+    note: 'MVMC predicts the surface and tracked points from two synchronized RGB views. Each point retains the color of its source pixel.',
   },
   ...GALLERY,
 ];
@@ -60,7 +69,7 @@ function sceneButton(item, preview, select) {
   button.dataset.scene = item.id;
   button.setAttribute('aria-pressed', 'false');
   const image = new Image();
-  image.src = preview;
+  image.src = preview + (item.revision ?? '');
   image.alt = '';
   image.loading = 'lazy';
   const label = document.createElement('span');
@@ -92,7 +101,7 @@ function initMovies() {
     index = at;
     const clip = playlist[index];
     video.pause();
-    video.poster = gallery + clip.id + '-poster.webp';
+    video.poster = gallery + clip.id + '-poster.webp' + (clip.revision ?? '');
     video.src = clip.movie;
     video.setAttribute('aria-label', clip.title);
     $('#film-dataset').textContent = clip.dataset;
@@ -316,7 +325,7 @@ function initViewer() {
     stopPlayback();
     if (asset) {
       const scene = studioScenes.find((item) => item.id === asset);
-      poster.src = scenes + asset + '-preview.webp';
+      poster.src = scenes + asset + '-preview.webp' + (scene.revision ?? '');
       poster.alt = 'MVMC preview of ' + scene.title;
     }
     poster.hidden = false;
@@ -335,11 +344,11 @@ function initViewer() {
     $('#frame-output').textContent = String(frame + 1).padStart(2, '0') + ' / ' + loaded.length;
   }
 
-  function record(asset) {
+  function record({ id: asset, revision = '' }) {
     if (!cache.has(asset)) {
       cache.set(asset, {
-        meta: fetchData(scenes + asset + '.json', 'json'),
-        predicted: fetchData(scenes + asset + '.bin', 'arrayBuffer'),
+        meta: fetchData(scenes + asset + '.json' + revision, 'json'),
+        predicted: fetchData(scenes + asset + '.bin' + revision, 'arrayBuffer'),
       });
     }
     return cache.get(asset);
@@ -349,7 +358,7 @@ function initViewer() {
     const current = ++generation;
     requestedSource = requested;
     const asset = id;
-    const entry = record(asset);
+    const entry = record(activeScene);
     if (requested === 'reference' && !entry.reference) {
       entry.reference = fetchData(scenes + asset + '-reference.bin', 'arrayBuffer');
     }

@@ -272,7 +272,7 @@ export class PointCloudViewer {
 
     gl.enable(gl.DEPTH_TEST);
     gl.uniform1i(this.splat, 1);
-    gl.uniform1i(this.shade, 1);
+    gl.uniform1i(this.shade, meta.preservePointColors ? 0 : 1);
     const pointSize = (cssHeight / 103) / this.zoomFactor * (meta.pointSize ?? 1);
     gl.uniform1f(this.size, clamp(pointSize, 1.3, 7.5) * dpr);
     this.bind(this.cloudBuffer, true);
