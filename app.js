@@ -1,4 +1,4 @@
-import { PointCloudViewer } from './viewer.js?v=all-backgrounds';
+import { PointCloudViewer } from './viewer.js?v=real-scenes';
 import { BENCHMARKS } from './metrics.js';
 import { GALLERY } from './gallery-data.js';
 
@@ -18,6 +18,11 @@ const couchScene = {
 
 const studioScenes = [
   { id: 'n3dv-flame-salmon', title: 'Flambéing salmon', frame: 19, dataset: 'N3DV', credit: 'https://github.com/facebookresearch/Neural_3D_Video', revision: '?v=static-bg' },
+  { id: 'sjtu-fan-dance', title: 'Fan dance with a step off a stool', frame: 11, dataset: 'SJTU Free Viewpoint', credit: 'https://medialab.sjtu.edu.cn/post/free-viewpoint-rgb-d-video-dataset/' },
+  { id: 'sjtu-football', title: 'Two-player football pass', frame: 13, dataset: 'SJTU Free Viewpoint', credit: 'https://medialab.sjtu.edu.cn/post/free-viewpoint-rgb-d-video-dataset/' },
+  { id: 'hdr-tumbler', title: 'Rotating a tumbler by hand', frame: 13, dataset: 'HDR-GoPro', credit: 'https://huggingface.co/datasets/SHlNDY/HDR-NSFF' },
+  { id: 'ucsd-courtyard', title: 'Walking across a courtyard', frame: 13, dataset: 'UCSD Dynamic', credit: 'https://cseweb.ucsd.edu/~viscomp/projects/ICCV21Deep/' },
+  { id: 'thun-street', title: 'Walking along a Thun street', frame: 7, dataset: 'DSEC', reference: 'LiDAR-derived depth', frames: 12, interval: 200, credit: 'https://dsec.ifi.uzh.ch/' },
   { id: 'fox-robot', title: 'Running fox & jumping robot', frame: 15, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Fox', revision: '?v=all-backgrounds' },
   { id: 'train-tram', title: 'Steam train passing a tram', frame: 12, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://kenney.nl/assets/train-kit', revision: '?v=all-backgrounds' },
   { id: 'zurich-night', title: 'Oncoming traffic at night', frame: 8, dataset: 'DSEC', reference: 'LiDAR-derived depth', frames: 12, interval: 200, credit: 'https://dsec.ifi.uzh.ch/', revision: '?v=static-bg' },

@@ -40,7 +40,7 @@ function unit(a) {
   return a.map((value) => value / length);
 }
 
-function cameraMatrix(eye, center, aspect, near, far) {
+function cameraMatrix(eye, center, aspect, near, far, fieldOfView = 41) {
   const z = unit(eye.map((value, axis) => value - center[axis]));
   const x = unit(cross([0, 1, 0], z));
   const y = cross(z, x);
@@ -48,7 +48,7 @@ function cameraMatrix(eye, center, aspect, near, far) {
     x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0,
     -dot(x, eye), -dot(y, eye), -dot(z, eye), 1,
   ];
-  const f = 1 / Math.tan(41 * Math.PI / 360);
+  const f = 1 / Math.tan(fieldOfView * Math.PI / 360);
   const a = (far + near) / (near - far);
   const b = (2 * far * near) / (near - far);
   const result = new Float32Array(16);
@@ -279,7 +279,8 @@ export class PointCloudViewer {
       Math.cos(this.azimuth) * c,
     ];
     const eye = meta.center.map((v, i) => v + radius * s[i]);
-    gl.uniformMatrix4fv(this.camera, false, cameraMatrix(eye, meta.center, aspect, .02 * r, radius + meta.radius * 3));
+    const projection = cameraMatrix(eye, meta.center, aspect, .02 * r, radius + meta.radius * 3, meta.fieldOfView);
+    gl.uniformMatrix4fv(this.camera, false, projection);
 
     gl.disable(gl.DEPTH_TEST);
     gl.uniform1i(this.splat, 0);
