@@ -319,6 +319,7 @@ select {
   font-size: .88rem;
   color: #bdcbe5;
 }
+.viewer-options { display: flex; align-items: center; flex-wrap: wrap; gap: .42rem 1rem; }
 .track-switch { display: inline-flex; align-items: center; gap: .4rem; color: var(--studio-ink); }
 .track-switch input { width: 16px; height: 16px; accent-color: #a7bcff; margin: 0; }
 .no-js { padding: 10px 16px; }

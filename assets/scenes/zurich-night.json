@@ -681,7 +681,7 @@
     "elevation": 0.22,
     "distance": 18.56
   },
-  "notes": "MVMC receives two synchronized RGB views. The viewer back-projects left-view depth, colors points with the input image and shows visible tracks anchored in the left source frame. The measured view uses official DSEC LiDAR-derived disparity and calibrated intrinsics. A fixed depth scale fitted once on background pixels places MVMC in metres. The measured view uses the model’s predicted poses to share the display coordinate system. Depth is shown at 12 matched timestamps. All displayed trajectories are model predictions. Both the MVMC and measured depth displays crop to the road in the original images and filter isolated points.",
+  "notes": "MVMC receives two synchronized RGB views. The viewer back-projects left-view depth, colors points with the input image and shows visible tracks anchored in the left source frame. The measured view uses official DSEC LiDAR-derived disparity and calibrated intrinsics. A fixed depth scale fitted once on background pixels places MVMC in metres. The measured view uses the model’s predicted poses to share the display coordinate system. Depth is shown at 12 matched timestamps. All displayed trajectories are model predictions. Both the MVMC and measured depth displays crop to the road in the original images and filter isolated points. Static background pools stable road and curb points from the selected depth source across time. It excludes sky and the swept areas around the tracked vehicles.",
   "source": {
     "type": "Recorded night-time stereo video",
     "assets": [
@@ -733,5 +733,51 @@
   },
   "pointSize": 0.92,
   "floor": false,
-  "trailLength": 11
+  "trailLength": 11,
+  "background": {
+    "predicted": {
+      "count": 1091,
+      "sha256": "67ca39058219a185f34af3b9b02c611fedcd02915d3aa6d545d286915c823516",
+      "minimumFrames": 4,
+      "medianFrames": 8.0,
+      "sampleFrames": [
+        96,
+        98,
+        100,
+        102,
+        104,
+        106,
+        108,
+        110,
+        112,
+        114,
+        116,
+        118
+      ],
+      "voxelSize": 0.25,
+      "source": "MVMC depth"
+    },
+    "reference": {
+      "count": 251,
+      "sha256": "d3f0d3971525dad5d92f2efc536e02f95ff994cb56a9ce44fe833d00785a66d1",
+      "minimumFrames": 4,
+      "medianFrames": 7.0,
+      "sampleFrames": [
+        96,
+        98,
+        100,
+        102,
+        104,
+        106,
+        108,
+        110,
+        112,
+        114,
+        116,
+        118
+      ],
+      "voxelSize": 0.25,
+      "source": "DSEC LiDAR-derived disparity"
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { PointCloudViewer } from './viewer.js?v=rgb-n3dv';
+import { PointCloudViewer } from './viewer.js?v=static-bg';
 import { BENCHMARKS } from './metrics.js';
 import { GALLERY } from './gallery-data.js';
 
@@ -17,10 +17,10 @@ const couchScene = {
 };
 
 const studioScenes = [
-  { id: 'n3dv-flame-salmon', title: 'Flambéing salmon', frame: 19, dataset: 'N3DV', credit: 'https://github.com/facebookresearch/Neural_3D_Video', revision: '?v=hands-pan' },
+  { id: 'n3dv-flame-salmon', title: 'Flambéing salmon', frame: 19, dataset: 'N3DV', credit: 'https://github.com/facebookresearch/Neural_3D_Video', revision: '?v=static-bg' },
   { id: 'fox-robot', title: 'Running fox & jumping robot', frame: 15, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Fox' },
   { id: 'train-tram', title: 'Steam train passing a tram', frame: 12, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://kenney.nl/assets/train-kit' },
-  { id: 'zurich-night', title: 'Oncoming traffic at night', frame: 8, dataset: 'DSEC', reference: 'LiDAR-derived depth', frames: 12, interval: 200, credit: 'https://dsec.ifi.uzh.ch/', revision: '?v=road-crop' },
+  { id: 'zurich-night', title: 'Oncoming traffic at night', frame: 8, dataset: 'DSEC', reference: 'LiDAR-derived depth', frames: 12, interval: 200, credit: 'https://dsec.ifi.uzh.ch/', revision: '?v=static-bg' },
   { id: 'humman-knee', title: 'Squat and knee lift', frame: 13, dataset: 'HuMMan-Recon', reference: 'Kinect depth', credit: 'https://huggingface.co/datasets/caizhongang/HuMMan/tree/main/humman_release_v1.0_recon' },
   couchScene,
 ];
@@ -298,6 +298,8 @@ function initViewer() {
   const seek = $('#scene-time');
   const play = $('#play-scene');
   const tracks = $('#show-trails');
+  const background = $('#show-background');
+  const backgroundControl = background.closest('label');
   const cache = new Map();
   let renderer;
   let id;
@@ -354,13 +356,30 @@ function initViewer() {
     return cache.get(asset);
   }
 
+  async function attachBackground(entry, asset, revision, requested, spec, current) {
+    if (!spec?.count) return;
+    const key = requested === 'reference' ? 'reference-background' : 'background';
+    entry[key] ??= fetchData(scenes + asset + '-' + key + '.bin' + revision, 'arrayBuffer');
+    try {
+      const bytes = await entry[key];
+      if (bytes.byteLength !== spec.count * 16) throw new Error('The static point cloud is incomplete');
+      if (current !== generation) return;
+      renderer.loadBackground(bytes, spec.count);
+      renderer.showBackground(background.checked);
+      backgroundControl.hidden = false;
+    } catch {
+      delete entry[key];
+    }
+  }
+
   async function selectCloud(requested, reset = false) {
     const current = ++generation;
     requestedSource = requested;
     const asset = id;
+    const revision = activeScene.revision ?? '';
     const entry = record(activeScene);
     if (requested === 'reference' && !entry.reference) {
-      entry.reference = fetchData(scenes + asset + '-reference.bin' + (activeScene.revision ?? ''), 'arrayBuffer');
+      entry.reference = fetchData(scenes + asset + '-reference.bin' + revision, 'arrayBuffer');
     }
     message(requested === 'reference' ? 'Loading ' + activeScene.reference.toLowerCase() + '…' : 'Loading the 3D scene…');
     try {
@@ -371,6 +390,7 @@ function initViewer() {
       if (!frames?.length || !Array.isArray(paths) || frames.some(({ count, offset }) => count <= 0 || offset < 0 || offset + count * 16 > binary.byteLength)) {
         throw new Error('The point cloud data is incomplete');
       }
+      backgroundControl.hidden = true;
       renderer.load(meta, binary, frames, paths, reset);
       tracks.disabled = paths.length === 0;
       renderer.showTrajectories(tracks.checked && !tracks.disabled);
@@ -388,6 +408,7 @@ function initViewer() {
       setFrame(Math.min(frame, frames.length - 1));
       setPressed(overlays, 'cloud', source);
       message('');
+      attachBackground(entry, asset, revision, requested, meta.background?.[requested], current);
     } catch {
       if (requested === 'reference') delete entry.reference;
       else cache.delete(asset);
@@ -433,6 +454,7 @@ function initViewer() {
     setFrame(Number(seek.value) - 1);
   });
   tracks.addEventListener('change', () => renderer.showTrajectories(tracks.checked));
+  background.addEventListener('change', () => renderer.showBackground(background.checked));
   play.addEventListener('click', () => {
     if (!loaded || timer) {
       stopPlayback();

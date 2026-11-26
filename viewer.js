@@ -13,10 +13,11 @@ const FRAGMENT_SOURCE = 'precision mediump float;' +
   'varying vec3 vColor;' +
   'uniform bool uSplat;' +
   'uniform bool uCloud;' +
+  'uniform float uGain;' +
   'void main() {' +
   '  if (uSplat && length(gl_PointCoord - vec2(0.5)) > 0.48) discard;' +
   '  vec3 color = uCloud ? pow(vColor, vec3(0.78)) : vColor;' +
-  '  gl_FragColor = vec4(color, 1.0);' +
+  '  gl_FragColor = vec4(color * uGain, 1.0);' +
   '}';
 
 const PALETTE = [
@@ -97,13 +98,17 @@ export class PointCloudViewer {
     this.size = gl.getUniformLocation(program, 'uSize');
     this.splat = gl.getUniformLocation(program, 'uSplat');
     this.shade = gl.getUniformLocation(program, 'uCloud');
+    this.gain = gl.getUniformLocation(program, 'uGain');
     gl.enableVertexAttribArray(this.position);
     gl.enableVertexAttribArray(this.color);
     gl.clearColor(0, 0, 0, 0);
     this.cloudBuffer = gl.createBuffer();
+    this.backgroundBuffer = gl.createBuffer();
     this.gridBuffer = gl.createBuffer();
     this.trailBuffer = gl.createBuffer();
     this.frame = 0;
+    this.backgroundCount = 0;
+    this.drawBackground = true;
     this.drawTrajectories = true;
     this.drawRequest = 0;
     this.attachCameraControls();
@@ -116,6 +121,7 @@ export class PointCloudViewer {
     this.frames = frames;
     this.bytes = bytes;
     this.tracks = tracks;
+    this.backgroundCount = 0;
     if (reset) {
       this.reset();
       this.prepareFloor();
@@ -155,6 +161,19 @@ export class PointCloudViewer {
 
   showTrajectories(show) {
     this.drawTrajectories = show;
+    this.draw();
+  }
+
+  loadBackground(bytes, count) {
+    const { gl } = this;
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.backgroundBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Uint8Array(bytes), gl.STATIC_DRAW);
+    this.backgroundCount = count;
+    this.draw();
+  }
+
+  showBackground(show) {
+    this.drawBackground = show;
     this.draw();
   }
 
@@ -265,6 +284,7 @@ export class PointCloudViewer {
     gl.disable(gl.DEPTH_TEST);
     gl.uniform1i(this.splat, 0);
     gl.uniform1i(this.shade, 0);
+    gl.uniform1f(this.gain, 1);
     if (this.gridCount) {
       this.bind(this.gridBuffer);
       gl.drawArrays(gl.LINES, 0, this.gridCount);
@@ -274,6 +294,13 @@ export class PointCloudViewer {
     gl.uniform1i(this.splat, 1);
     gl.uniform1i(this.shade, meta.preservePointColors ? 0 : 1);
     const pointSize = (cssHeight / 103) / this.zoomFactor * (meta.pointSize ?? 1);
+    if (this.drawBackground && this.backgroundCount) {
+      gl.uniform1f(this.gain, .66);
+      gl.uniform1f(this.size, clamp(pointSize * .84, 1.3, 6) * dpr);
+      this.bind(this.backgroundBuffer, true);
+      gl.drawArrays(gl.POINTS, 0, this.backgroundCount);
+      gl.uniform1f(this.gain, 1);
+    }
     gl.uniform1f(this.size, clamp(pointSize, 1.3, 7.5) * dpr);
     this.bind(this.cloudBuffer, true);
     gl.drawArrays(gl.POINTS, 0, this.frames[this.frame].count);
