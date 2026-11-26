@@ -9,124 +9,124 @@
   "frames": [
     {
       "offset": 0,
-      "count": 19205,
+      "count": 7072,
       "time": 0
     },
     {
-      "offset": 307280,
-      "count": 20071,
+      "offset": 113152,
+      "count": 8200,
       "time": 1
     },
     {
-      "offset": 628416,
-      "count": 21642,
+      "offset": 244352,
+      "count": 9805,
       "time": 2
     },
     {
-      "offset": 974688,
-      "count": 24101,
+      "offset": 401232,
+      "count": 12599,
       "time": 3
     },
     {
-      "offset": 1360304,
-      "count": 25215,
+      "offset": 602816,
+      "count": 14139,
       "time": 4
     },
     {
-      "offset": 1763744,
-      "count": 25837,
+      "offset": 829040,
+      "count": 14649,
       "time": 5
     },
     {
-      "offset": 2177136,
-      "count": 27202,
+      "offset": 1063424,
+      "count": 14810,
       "time": 6
     },
     {
-      "offset": 2612368,
-      "count": 28353,
+      "offset": 1300384,
+      "count": 14886,
       "time": 7
     },
     {
-      "offset": 3066016,
-      "count": 28194,
+      "offset": 1538560,
+      "count": 14825,
       "time": 8
     },
     {
-      "offset": 3517120,
-      "count": 28369,
+      "offset": 1775760,
+      "count": 14589,
       "time": 9
     },
     {
-      "offset": 3971024,
-      "count": 28336,
+      "offset": 2009184,
+      "count": 14658,
       "time": 10
     },
     {
-      "offset": 4424400,
-      "count": 28294,
+      "offset": 2243712,
+      "count": 14959,
       "time": 11
     }
   ],
   "referenceFrames": [
     {
       "offset": 0,
-      "count": 12750,
+      "count": 8823,
       "time": 0
     },
     {
-      "offset": 204000,
-      "count": 12247,
+      "offset": 141168,
+      "count": 8795,
       "time": 1
     },
     {
-      "offset": 399952,
-      "count": 10791,
+      "offset": 281888,
+      "count": 8093,
       "time": 2
     },
     {
-      "offset": 572608,
-      "count": 11394,
+      "offset": 411376,
+      "count": 8875,
       "time": 3
     },
     {
-      "offset": 754912,
-      "count": 11963,
+      "offset": 553376,
+      "count": 8899,
       "time": 4
     },
     {
-      "offset": 946320,
-      "count": 11308,
+      "offset": 695760,
+      "count": 8698,
       "time": 5
     },
     {
-      "offset": 1127248,
-      "count": 11304,
+      "offset": 834928,
+      "count": 8857,
       "time": 6
     },
     {
-      "offset": 1308112,
-      "count": 11425,
+      "offset": 976640,
+      "count": 8942,
       "time": 7
     },
     {
-      "offset": 1490912,
-      "count": 11125,
+      "offset": 1119712,
+      "count": 9101,
       "time": 8
     },
     {
-      "offset": 1668912,
-      "count": 10658,
+      "offset": 1265328,
+      "count": 8909,
       "time": 9
     },
     {
-      "offset": 1839440,
-      "count": 10133,
+      "offset": 1407872,
+      "count": 8700,
       "time": 10
     },
     {
-      "offset": 2001568,
-      "count": 9864,
+      "offset": 1547072,
+      "count": 8515,
       "time": 11
     }
   ],
@@ -671,7 +671,7 @@
   "referenceTracks": [],
   "center": [
     -7.6,
-    -0.6,
+    -1.36,
     -32.0
   ],
   "radius": 29.0,
@@ -681,7 +681,7 @@
     "elevation": 0.22,
     "distance": 18.56
   },
-  "notes": "MVMC receives two synchronized RGB views. The viewer back-projects left-view depth, colors points with the input image and shows visible tracks anchored in the left source frame. The measured view uses official DSEC LiDAR-derived disparity and calibrated intrinsics. A fixed depth scale fitted once on background pixels places MVMC in metres. The measured view uses the model’s predicted poses to share the display coordinate system. Depth is shown at 12 matched timestamps. All displayed trajectories are model predictions.",
+  "notes": "MVMC receives two synchronized RGB views. The viewer back-projects left-view depth, colors points with the input image and shows visible tracks anchored in the left source frame. The measured view uses official DSEC LiDAR-derived disparity and calibrated intrinsics. A fixed depth scale fitted once on background pixels places MVMC in metres. The measured view uses the model’s predicted poses to share the display coordinate system. Depth is shown at 12 matched timestamps. All displayed trajectories are model predictions. Both the MVMC and measured depth displays crop to the road in the original images and filter isolated points.",
   "source": {
     "type": "Recorded night-time stereo video",
     "assets": [
@@ -691,7 +691,7 @@
         "author": "Mathias Gehrig, Willem Aarents, Daniel Gehrig, and Davide Scaramuzza",
         "license": "CC BY-SA 4.0",
         "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
-        "changes": "Cropped and resized RGB, enhanced brightness for display, and converted measured disparity into sampled point clouds. The DSEC-derived scene media are shared under CC BY-SA 4.0."
+        "changes": "Cropped and resized RGB, enhanced brightness for display, and converted measured disparity into sampled point clouds. The DSEC-derived scene media are shared under CC BY-SA 4.0. The interactive view crops to the road and filters isolated points."
       }
     ]
   },
@@ -702,8 +702,8 @@
     "predictionSha256": "40ad9382a27eac94781107c7086b496b783fa3a3ba622a5adf2e7cf8ea88c84e",
     "referenceSha256": "06ad43f428d11cdf09daa02464c49272219bd27638f10500f98ed62bbb0c9903",
     "associatedVideoSha256": "85d7a4de3b68c26a4aee53d03d6ededcb10b5d6b30f6b061676137583e2a9ee3",
-    "modelFileSha256": "7080c78d69d1e24808b713cf38a97c156a26decc17a6c15ca79d3ff3c7cf54b9",
-    "referenceFileSha256": "450b19b9e3a9e5f2b4256ee4be643d7df41077edefdfce641f84ea62238b0715",
+    "modelFileSha256": "bc940e3137727d5a9d92d5ed927f2d3c916ce7892a1e57a8abef62097f41eebf",
+    "referenceFileSha256": "596219d3b672855ff521b446de5df7bf3ff9f9e87aa8c7edebe02fa755f9f05f",
     "bothViews": 2,
     "inputFrameCount": 24,
     "queryCount": 24,
@@ -731,7 +731,7 @@
     "referenceUsesPredictedPoses": true,
     "displayTrackCount": 10
   },
-  "pointSize": 0.81,
+  "pointSize": 0.92,
   "floor": false,
   "trailLength": 11
 }

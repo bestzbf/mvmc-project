@@ -17,12 +17,12 @@ const couchScene = {
 };
 
 const studioScenes = [
+  { id: 'n3dv-flame-salmon', title: 'Flambéing salmon', frame: 19, dataset: 'N3DV', credit: 'https://github.com/facebookresearch/Neural_3D_Video', revision: '?v=hands-pan' },
   { id: 'fox-robot', title: 'Running fox & jumping robot', frame: 15, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Fox' },
   { id: 'train-tram', title: 'Steam train passing a tram', frame: 12, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://kenney.nl/assets/train-kit' },
-  { id: 'zurich-night', title: 'Oncoming traffic at night', frame: 8, dataset: 'DSEC', reference: 'LiDAR-derived depth', frames: 12, interval: 200, credit: 'https://dsec.ifi.uzh.ch/' },
+  { id: 'zurich-night', title: 'Oncoming traffic at night', frame: 8, dataset: 'DSEC', reference: 'LiDAR-derived depth', frames: 12, interval: 200, credit: 'https://dsec.ifi.uzh.ch/', revision: '?v=road-crop' },
   { id: 'humman-knee', title: 'Squat and knee lift', frame: 13, dataset: 'HuMMan-Recon', reference: 'Kinect depth', credit: 'https://huggingface.co/datasets/caizhongang/HuMMan/tree/main/humman_release_v1.0_recon' },
   couchScene,
-  { id: 'n3dv-flame-salmon', title: 'Flambéing salmon', frame: 11, dataset: 'N3DV', credit: 'https://github.com/facebookresearch/Neural_3D_Video' },
 ];
 
 const galleryClips = [
@@ -360,7 +360,7 @@ function initViewer() {
     const asset = id;
     const entry = record(activeScene);
     if (requested === 'reference' && !entry.reference) {
-      entry.reference = fetchData(scenes + asset + '-reference.bin', 'arrayBuffer');
+      entry.reference = fetchData(scenes + asset + '-reference.bin' + (activeScene.revision ?? ''), 'arrayBuffer');
     }
     message(requested === 'reference' ? 'Loading ' + activeScene.reference.toLowerCase() + '…' : 'Loading the 3D scene…');
     try {
