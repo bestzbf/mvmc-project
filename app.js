@@ -10,10 +10,10 @@ const $ = (selector) => document.querySelector(selector);
 const couchScene = {
   id: 'scenehub-couch',
   title: 'Turning on a couch',
-  frame: 12,
+  frame: 15,
   dataset: 'SceneHub4D',
   credit: 'https://scenehub4d.github.io/',
-  revision: '?v=rgb',
+  revision: '?v=couch-refined',
 };
 
 const studioScenes = [
@@ -22,7 +22,7 @@ const studioScenes = [
   { id: 'train-tram', title: 'Steam train passing a tram', frame: 12, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://kenney.nl/assets/train-kit', revision: '?v=all-backgrounds' },
   { id: 'zurich-night', title: 'Oncoming traffic at night', frame: 8, dataset: 'DSEC', reference: 'LiDAR-derived depth', frames: 12, interval: 200, credit: 'https://dsec.ifi.uzh.ch/', revision: '?v=static-bg' },
   { id: 'humman-knee', title: 'Squat and knee lift', frame: 13, dataset: 'HuMMan-Recon', reference: 'Kinect depth', credit: 'https://huggingface.co/datasets/caizhongang/HuMMan/tree/main/humman_release_v1.0_recon', revision: '?v=all-backgrounds' },
-  { ...couchScene, revision: '?v=all-backgrounds' },
+  couchScene,
 ];
 
 const galleryClips = [
@@ -34,7 +34,7 @@ const galleryClips = [
     category: 'articulated',
     real: true,
     movie: gallery + couchScene.id + '.mp4' + couchScene.revision,
-    note: 'MVMC predicts the surface and tracked points from two synchronized RGB views. Each point retains the color of its source pixel.',
+    note: 'Selected MVMC trajectories show the turn from two synchronized RGB views. The static room background is fused from several frames.',
   },
   ...GALLERY,
 ];
