@@ -15,7 +15,7 @@ Start the local server from the repository root.
 ## Demo data
 
 - **3D viewer.** The fox and robot and train and tram scenes have independently rendered geometry and tracks. The DSEC and HuMMan-Recon scenes have measured depth views. The SceneHub4D couch and N3DV cooking scenes show predicted geometry and trajectories with point colors sampled from their RGB views. [Scene metadata](assets/scenes/) gives the display protocol, credit URLs, and frame indices. The binary point streams use little-endian float32 XYZ and three uint8 RGB values with one padding byte per point.
-- **Static background.** The N3DV and night driving demos can overlay stationary surfaces fused from several frames. The MVMC and LiDAR-derived driving views each use a background fused from their own depth source.
+- **Static background.** Each interactive scene can overlay stationary surfaces fused from several frames. Prediction and reference views each use a background fused from their own depth source.
 - **Motion gallery.** Seven clips show real captures and 23 show controlled synthetic scenes. The SceneHub4D clip is rendered from the interactive 3D data. Separate thumbnails and a highlight reel use cropped previews. [Media credits](assets/licenses/scene-credits.html)
 - **Qualitative comparisons.** The interactive panels are crops of the included full figures. Some show trajectories across the full sequence and others overlay tracked points on one frame.
 - **Benchmark results.** The site reproduces Table 1 for MV-Kubric and Panoptic at the reported precision. An em dash marks an unavailable score. [Metric data](metrics.js)

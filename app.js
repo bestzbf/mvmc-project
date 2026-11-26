@@ -1,4 +1,4 @@
-import { PointCloudViewer } from './viewer.js?v=static-bg';
+import { PointCloudViewer } from './viewer.js?v=all-backgrounds';
 import { BENCHMARKS } from './metrics.js';
 import { GALLERY } from './gallery-data.js';
 
@@ -18,11 +18,11 @@ const couchScene = {
 
 const studioScenes = [
   { id: 'n3dv-flame-salmon', title: 'Flambéing salmon', frame: 19, dataset: 'N3DV', credit: 'https://github.com/facebookresearch/Neural_3D_Video', revision: '?v=static-bg' },
-  { id: 'fox-robot', title: 'Running fox & jumping robot', frame: 15, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Fox' },
-  { id: 'train-tram', title: 'Steam train passing a tram', frame: 12, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://kenney.nl/assets/train-kit' },
+  { id: 'fox-robot', title: 'Running fox & jumping robot', frame: 15, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://github.com/KhronosGroup/glTF-Sample-Assets/tree/main/Models/Fox', revision: '?v=all-backgrounds' },
+  { id: 'train-tram', title: 'Steam train passing a tram', frame: 12, dataset: 'Synthetic', reference: 'Rendered reference', credit: 'https://kenney.nl/assets/train-kit', revision: '?v=all-backgrounds' },
   { id: 'zurich-night', title: 'Oncoming traffic at night', frame: 8, dataset: 'DSEC', reference: 'LiDAR-derived depth', frames: 12, interval: 200, credit: 'https://dsec.ifi.uzh.ch/', revision: '?v=static-bg' },
-  { id: 'humman-knee', title: 'Squat and knee lift', frame: 13, dataset: 'HuMMan-Recon', reference: 'Kinect depth', credit: 'https://huggingface.co/datasets/caizhongang/HuMMan/tree/main/humman_release_v1.0_recon' },
-  couchScene,
+  { id: 'humman-knee', title: 'Squat and knee lift', frame: 13, dataset: 'HuMMan-Recon', reference: 'Kinect depth', credit: 'https://huggingface.co/datasets/caizhongang/HuMMan/tree/main/humman_release_v1.0_recon', revision: '?v=all-backgrounds' },
+  { ...couchScene, revision: '?v=all-backgrounds' },
 ];
 
 const galleryClips = [

@@ -285,7 +285,7 @@ export class PointCloudViewer {
     gl.uniform1i(this.splat, 0);
     gl.uniform1i(this.shade, 0);
     gl.uniform1f(this.gain, 1);
-    if (this.gridCount) {
+    if (this.gridCount && !(this.drawBackground && this.backgroundCount)) {
       this.bind(this.gridBuffer);
       gl.drawArrays(gl.LINES, 0, this.gridCount);
     }
