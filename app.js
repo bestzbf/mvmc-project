@@ -291,6 +291,96 @@ async function fetchData(url, format) {
   return response[format]();
 }
 
+function initInputRgb() {
+  const directory = './assets/input-rgb/';
+  const grid = $('#input-camera-grid');
+  const status = $('#input-rgb-status');
+  let manifest;
+  let selection;
+  let frame;
+  let time;
+
+  function message(text) {
+    status.textContent = text;
+    status.hidden = !text;
+    grid.hidden = Boolean(text);
+  }
+
+  function render() {
+    if (!selection?.cameras) return;
+    const { spec, cameras } = selection;
+    if (frame >= spec.frameTimes.length || (time !== undefined && time !== spec.frameTimes[frame])) {
+      message('RGB inputs are unavailable for this frame.');
+      return;
+    }
+    if (grid.hidden) message('');
+    const row = Math.floor(frame / spec.columns);
+    const column = frame % spec.columns;
+    for (const { view, image, context } of cameras) {
+      const { width, height } = view;
+      context.drawImage(image, column * width, row * height, width, height, 0, 0, width, height);
+    }
+  }
+
+  async function show(scene, firstFrame) {
+    const current = {};
+    selection = current;
+    frame = firstFrame;
+    time = undefined;
+    grid.replaceChildren();
+    message('Loading camera views…');
+    try {
+      manifest ??= fetchData(directory + 'manifest.json?v=rgb-inputs', 'json').catch((error) => {
+        manifest = undefined;
+        throw error;
+      });
+      const spec = (await manifest)[scene.id];
+      if (selection !== current) return;
+      if (!spec?.views?.length || spec.frameTimes.length !== (scene.frames ?? 24)) {
+        throw new Error('Input frames are unavailable');
+      }
+      const rows = Math.ceil(spec.frameTimes.length / spec.columns);
+      const cameras = await Promise.all(spec.views.map(async (view) => {
+        const image = new Image();
+        image.src = directory + view.file + '?v=' + view.sha256.slice(0, 12);
+        await image.decode();
+        if (image.naturalWidth !== spec.columns * view.width || image.naturalHeight !== rows * view.height) {
+          throw new Error('Input image dimensions do not match the timeline');
+        }
+        const figure = document.createElement('figure');
+        figure.className = 'input-camera';
+        const canvas = document.createElement('canvas');
+        canvas.width = view.width;
+        canvas.height = view.height;
+        canvas.setAttribute('role', 'img');
+        canvas.setAttribute('aria-label', view.label + ' RGB input');
+        const caption = document.createElement('figcaption');
+        caption.textContent = view.label;
+        figure.append(canvas, caption);
+        const context = canvas.getContext('2d');
+        if (!context) throw new Error('RGB canvas is unavailable');
+        return { view, image, context, figure };
+      }));
+      if (selection !== current) return;
+      Object.assign(current, { spec, cameras });
+      grid.dataset.count = cameras.length;
+      grid.replaceChildren(...cameras.map(({ figure }) => figure));
+      render();
+    } catch {
+      if (selection === current) message('The RGB inputs could not load.');
+    }
+  }
+
+  return {
+    show,
+    setFrame(index, frameTime) {
+      frame = index;
+      time = frameTime;
+      render();
+    },
+  };
+}
+
 function initViewer() {
   const picker = $('#studio-scenes');
   const canvas = $('#scene-canvas');
@@ -306,6 +396,7 @@ function initViewer() {
   const background = $('#show-background');
   const backgroundControl = background.closest('label');
   const cache = new Map();
+  const rgb = initInputRgb();
   let renderer;
   let id;
   let source;
@@ -346,6 +437,7 @@ function initViewer() {
     if (!loaded) return;
     frame = index;
     renderer.setFrame(frame);
+    rgb.setFrame(frame, loaded[frame].time);
     seek.value = frame + 1;
     seek.setAttribute('aria-valuetext', 'Frame ' + (frame + 1) + ' of ' + loaded.length);
     $('#frame-output').textContent = String(frame + 1).padStart(2, '0') + ' / ' + loaded.length;
@@ -446,6 +538,7 @@ function initViewer() {
     reference.hidden = !scene.reference;
     setPressed(picker, 'scene', id);
     showFallback(id, renderer ? 'Loading the 3D scene…' : 'WebGL is unavailable. A rendered preview is shown.');
+    rgb.show(scene, frame);
     if (renderer) selectCloud(source, true);
   }
 
